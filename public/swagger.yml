@@ -1,0 +1,145 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Microservice Memories
+  description: >
+    #### Allows users to vent about "kids these days"
+basePath: /api/v1
+parameters:
+  year:
+    name: year
+    in: path
+    description: The year of the memories
+    type: integer
+    required: true
+definitions:
+  Links:
+    type: object
+  MemoryCollection:
+    type: object
+    properties:
+      links:
+        $ref: '#/definitions/Links'
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/MemoryResource'
+  MemoryDocument:
+    type: object
+    properties:
+      links:
+        $ref: '#/definitions/Links'
+      data:
+        $ref: '#/definitions/MemoryResource'
+  MemoryResource:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+        - memory
+      id:
+        type: integer
+      attributes:
+        $ref: '#/definitions/Memory'
+      links:
+        $ref: '#/definitions/Links'
+  Memory:
+    type: object
+    properties:
+      old_days:
+        type: string
+      these_days:
+        type: string
+      year:
+        type: integer
+  Error:
+    type: object
+    properties:
+      error:
+        type: array
+        items:
+          type: object
+          properties:
+            status:
+              type: string
+            source:
+              type: object
+              properties:
+                pointer:
+                  type: string
+            title:
+              type: string
+            details:
+              type: string
+paths:
+  '/memories':
+    get:
+      description: >
+        Lists all memories
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/MemoryCollection'
+    post:
+      description: >
+        Creates a new memory
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/MemoryDocument'
+        '400':
+          description: Validation error
+          schema:
+            $ref: '#/definitions/Error'
+      parameters:
+        - name: Payload
+          in: body
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                    - memory
+                  attributes:
+                    type: object
+                    properties:
+                      old_days:
+                        type: string
+                      these_days:
+                        type: string
+                      year:
+                        type: integer
+  '/memories/{year}':
+    get:
+      parameters:
+        - $ref: '#/parameters/year'
+      description: >
+        Lists all memories for a given year
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/MemoryCollection'
+  '/memories/years':
+    get:
+      description: >
+        Lists the unique years
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              links:
+                $ref: '#/definitions/Links'
+              data:
+                type: array
+                items:
+                  type: integer
