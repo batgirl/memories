@@ -27,6 +27,7 @@ router.post('/api/v1/memories', function(req, res, next) {
       return console.error('error fetching client from pool', err);
     }
     console.log("connected to database");
+    console.log(req.body);
     client.query('INSERT INTO memories(old_days, these_days, year) VALUES($1, $2, $3) returning id', [req.body.data.attributes.old_days, req.body.data.attributes.these_days, req.body.data.attributes.year], function(err, result) {
       done();
       if(err) {
